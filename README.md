@@ -1,6 +1,6 @@
-# interficio
+# live_location
 
-A new Flutter project.
+A basic flutter app that uses the google_maps_flutter and location plugin to actively track and display your live location
 
 ## Getting Started
 
