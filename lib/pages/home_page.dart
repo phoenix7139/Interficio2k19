@@ -119,41 +119,41 @@ class _HomePageState extends State<HomePage> {
             top: top2,
             duration: Duration(milliseconds: 500),
             curve: Curves.easeInCirc,
-            child: GestureDetector(
-              onVerticalDragStart: (context) {
-                setState(() {
-                  if (_isUp) {
-                    bottom2 = -10.0;
-                    right2 = 0.0;
-                    left2 = 0.0;
-                    top2 = 370.0;
+            child: Center(
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeInCirc,
+                opacity: _isUp ? 0.6 : 0.9,
+                child: GestureDetector(
+                  onVerticalDragStart: (context) {
+                    setState(() {
+                      if (_isUp) {
+                        bottom2 = -10.0;
+                        right2 = 0.0;
+                        left2 = 0.0;
+                        top2 = 370.0;
 
-                    bottom = 290.0;
-                    right = 50.0;
-                    left = 50.0;
-                    top = 250;
+                        bottom = 290.0;
+                        right = 50.0;
+                        left = 50.0;
+                        top = 250;
 
-                    _isUp = !_isUp;
-                  } else {
-                    bottom2 = -400.0;
-                    right2 = 0.0;
-                    left2 = 0.0;
-                    top2 = 590;
+                        _isUp = !_isUp;
+                      } else {
+                        bottom2 = -400.0;
+                        right2 = 0.0;
+                        left2 = 0.0;
+                        top2 = 590;
 
-                    bottom = 70.0;
-                    right = 10.0;
-                    left = 10.0;
-                    top = 470;
+                        bottom = 70.0;
+                        right = 10.0;
+                        left = 10.0;
+                        top = 470;
 
-                    _isUp = !_isUp;
-                  }
-                });
-              },
-              child: Center(
-                child: AnimatedOpacity(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeInCirc,
-                  opacity: _isUp ? 0.7 : 1.0,
+                        _isUp = !_isUp;
+                      }
+                    });
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
                     // margin: EdgeInsets.symmetric(vertical: 50),
@@ -184,6 +184,61 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+          ),
+          AnimatedPositioned(
+            bottom: bottom - 55,
+            right: 20,
+            left: 20,
+            top: top + 75,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInCirc,
+            child: GestureDetector(
+                onVerticalDragStart: (context) {
+                  setState(() {
+                    if (_isUp) {
+                      bottom2 = -10.0;
+                      right2 = 0.0;
+                      left2 = 0.0;
+                      top2 = 370.0;
+
+                      bottom = 290.0;
+                      right = 50.0;
+                      left = 50.0;
+                      top = 250;
+
+                      _isUp = !_isUp;
+                    } else {
+                      bottom2 = -400.0;
+                      right2 = 0.0;
+                      left2 = 0.0;
+                      top2 = 590;
+
+                      bottom = 70.0;
+                      right = 10.0;
+                      left = 10.0;
+                      top = 470;
+
+                      _isUp = !_isUp;
+                    }
+                  });
+                },
+                child: Row(
+                  children: <Widget>[
+                    Image.asset("assets/leaderboard.png"),
+                    SizedBox(width: 30),
+                    Container(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Text(
+                        "LEADERBOARD",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 27,
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
           ),
         ],
       ),
