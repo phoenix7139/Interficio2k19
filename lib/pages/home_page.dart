@@ -46,16 +46,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  bool isUp = false;
+  bool _isUp = false;
 
   var bottom = 70.0;
-  var right = 10.0;
-  var left = 10.0;
+  var right = 0.0;
+  var left = 0.0;
   var top = 470.0;
 
   var bottom2 = -40.0;
-  var right2 = 10.0;
-  var left2 = 10.0;
+  var right2 = 0.0;
+  var left2 = 0.0;
   var top2 = 590.0;
 
   @override
@@ -77,84 +77,21 @@ class _HomePageState extends State<HomePage> {
             left: left,
             top: top,
             duration: Duration(milliseconds: 500),
-            curve: Curves.easeIn,
+            curve: Curves.easeInCirc,
             child: Center(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(17),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "LATITUDE: $lat",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      Text(
-                        "LONGITUDE: $long",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      Text(
-                        "ACCURACY: $accuracy",
-                        style: TextStyle(color: Colors.black),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          AnimatedPositioned(
-            bottom: bottom2,
-            right: right2,
-            left: left2,
-            top: top2,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeIn,
-            child: GestureDetector(
-              onVerticalDragStart: (context) {
-                setState(() {
-                  if (isUp) {
-                    bottom2 = -10.0;
-                    right2 = 10.0;
-                    left2 = 10.0;
-                    top2 = 370.0;
-
-                    bottom = 290.0;
-                    right = 25.0;
-                    left = 25.0;
-                    top = 250;
-
-                    isUp = !isUp;
-                  } else {
-                    bottom2 = -400.0;
-                    right2 = 10.0;
-                    left2 = 10.0;
-                    top2 = 590;
-
-                    bottom = 70.0;
-                    right = 10.0;
-                    left = 10.0;
-                    top = 470;
-
-                    isUp = !isUp;
-                  }
-                });
-              },
-              child: Center(
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeInCirc,
+                opacity: _isUp ? 0.7 : 0.0,
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-                  // margin: EdgeInsets.symmetric(vertical: 50),
+                  padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.grey,
+                    color: Colors.grey[400],
                     borderRadius: BorderRadius.circular(17),
                   ),
                   child: Center(
-                    child: ListView(
-                      // mainAxisAlignment: MainAxisAlignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
                           "LATITUDE: $lat",
@@ -169,6 +106,79 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(color: Colors.black),
                         )
                       ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          AnimatedPositioned(
+            bottom: bottom2,
+            right: right2,
+            left: left2,
+            top: top2,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInCirc,
+            child: GestureDetector(
+              onVerticalDragStart: (context) {
+                setState(() {
+                  if (_isUp) {
+                    bottom2 = -10.0;
+                    right2 = 0.0;
+                    left2 = 0.0;
+                    top2 = 370.0;
+
+                    bottom = 290.0;
+                    right = 50.0;
+                    left = 50.0;
+                    top = 250;
+
+                    _isUp = !_isUp;
+                  } else {
+                    bottom2 = -400.0;
+                    right2 = 0.0;
+                    left2 = 0.0;
+                    top2 = 590;
+
+                    bottom = 70.0;
+                    right = 10.0;
+                    left = 10.0;
+                    top = 470;
+
+                    _isUp = !_isUp;
+                  }
+                });
+              },
+              child: Center(
+                child: AnimatedOpacity(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInCirc,
+                  opacity: _isUp ? 0.7 : 1.0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
+                    // margin: EdgeInsets.symmetric(vertical: 50),
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue[800],
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                    child: Center(
+                      child: ScrollConfiguration(
+                        behavior: MyBehavior(),
+                        child: ListView(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            ListTile(
+                              leading: Text("LATITUDE: $lat"),
+                            ),
+                            ListTile(
+                              leading: Text("LONGITUDE: $long"),
+                            ),
+                            ListTile(
+                              leading: Text("ACCURACY: $accuracy"),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -200,66 +210,19 @@ class _GameMapState extends State<GameMap> {
       //mapType: MapType.hybrid,
       compassEnabled: true,
     );
-    // Positioned(
-    //   bottom: 20,
-    //   left: 20,
-    //   right: 20,
-    //   top: 480,
-    //   child: Container(
-    //     margin: EdgeInsets.all(20),
-    //     padding: EdgeInsets.all(20),
-    //     decoration: BoxDecoration(
-    //       color: Colors.white,
-    //       borderRadius: BorderRadius.circular(13),
-    //     ),
-    //     child: Column(
-    //       children: <Widget>[
-    //         Text("LATITUDE: $lat"),
-    //         Text("LONGITUDE: $long"),
-    //         Text("ACCURACY: $accuracy")
-    //       ],
-    //     ),
-    //   ),
-    // ),
-    // Positioned(
-    //   bottom: 140,
-    //   left: 20,
-    //   right: 20,
-    //   top: 405,
-    //   child: Container(
-    //     margin: EdgeInsets.all(20),
-    //     padding: EdgeInsets.all(20),
-    //     decoration: BoxDecoration(
-    //       color: meter1 < accuracy && meter1 < 30
-    //           ? Colors.green[400]
-    //           : Colors.red[400],
-    //       borderRadius: BorderRadius.circular(13),
-    //     ),
-    //     child: Text("room: $meter1"),
-    //   ),
-    // ),
-    // Positioned(
-    //   bottom: 200,
-    //   left: 20,
-    //   right: 20,
-    //   top: 345,
-    //   child: Container(
-    //     margin: EdgeInsets.all(20),
-    //     padding: EdgeInsets.all(20),
-    //     decoration: BoxDecoration(
-    //       color: meter2 < accuracy && meter2 < 30
-    //           ? Colors.green[400]
-    //           : Colors.red[400],
-    //       borderRadius: BorderRadius.circular(13),
-    //     ),
-    //     child: Text("ovals: $meter2"),
-    //   ),
-    // )
   }
 
   _onMapCreated(GoogleMapController controller) {
     setState(() {
       mapController = controller;
     });
+  }
+}
+
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }
