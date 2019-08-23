@@ -46,17 +46,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  bool _isUp = false;
+  bool _isUp = true;
 
   var bottom = 70.0;
-  var right = 0.0;
-  var left = 0.0;
+  var right = 10.0;
+  var left = 10.0;
   var top = 470.0;
 
-  var bottom2 = -40.0;
+  var bottom2 = -10.0;
   var right2 = 0.0;
   var left2 = 0.0;
   var top2 = 590.0;
+
+  var bottom3 = 630.0;
+  var right3 = 0.0;
+  var left3 = 0.0;
+  var top3 = -10.0;
 
   @override
   Widget build(BuildContext context) {
@@ -72,40 +77,70 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           GameMap(),
           AnimatedPositioned(
+            bottom: bottom3,
+            right: right3,
+            left: left3,
+            top: top3,
+            duration: Duration(milliseconds: 700),
+            curve: Curves.easeInCirc,
+            child: Center(
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 700),
+                curve: Curves.easeInCirc,
+                opacity: _isUp ? 0.5 : 0.8,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    //   stops: [0.5, 1.0],
+                    //   colors: [Colors.green, Colors.lightGreen],
+                    // ),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: [0.7, 1.0],
+                      colors: [Colors.black, Colors.grey],
+                    ),
+                    // color: Colors.black,
+                    borderRadius: BorderRadius.circular(17),
+                  ),
+                  child: Container(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "INSTRUCTIONS",
+                      style:
+                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          AnimatedPositioned(
             bottom: bottom,
             right: right,
             left: left,
             top: top,
-            duration: Duration(milliseconds: 500),
+            duration: Duration(milliseconds: 700),
             curve: Curves.easeInCirc,
             child: Center(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 500),
+                duration: Duration(milliseconds: 700),
                 curve: Curves.easeInCirc,
                 opacity: _isUp ? 0.7 : 0.0,
                 child: Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.grey[400],
+                    color: Colors.grey,
                     borderRadius: BorderRadius.circular(17),
                   ),
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          "LATITUDE: $lat",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        Text(
-                          "LONGITUDE: $long",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        Text(
-                          "ACCURACY: $accuracy",
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                    child: Text(
+                      "INTERFICIO",
+                      style:
+                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -117,13 +152,13 @@ class _HomePageState extends State<HomePage> {
             right: right2,
             left: left2,
             top: top2,
-            duration: Duration(milliseconds: 500),
+            duration: Duration(milliseconds: 700),
             curve: Curves.easeInCirc,
             child: Center(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 500),
+                duration: Duration(milliseconds: 700),
                 curve: Curves.easeInCirc,
-                opacity: _isUp ? 0.6 : 0.9,
+                opacity: _isUp ? 0.5 : 0.8,
                 child: GestureDetector(
                   onVerticalDragStart: (context) {
                     setState(() {
@@ -131,24 +166,34 @@ class _HomePageState extends State<HomePage> {
                         bottom2 = -10.0;
                         right2 = 0.0;
                         left2 = 0.0;
-                        top2 = 370.0;
+                        top2 = 270.0;
 
-                        bottom = 290.0;
+                        bottom = 390.0;
                         right = 50.0;
                         left = 50.0;
-                        top = 250;
+                        top = 150;
+
+                        bottom3 = 390.0;
+                        right3 = 0.0;
+                        left3 = 0.0;
+                        top3 = -10.0;
 
                         _isUp = !_isUp;
                       } else {
-                        bottom2 = -400.0;
+                        bottom2 = -10.0;
                         right2 = 0.0;
                         left2 = 0.0;
-                        top2 = 590;
+                        top2 = 590.0;
 
                         bottom = 70.0;
                         right = 10.0;
                         left = 10.0;
                         top = 470;
+
+                        bottom3 = 630.0;
+                        right3 = 0.0;
+                        left3 = 0.0;
+                        top3 = -10.0;
 
                         _isUp = !_isUp;
                       }
@@ -158,7 +203,13 @@ class _HomePageState extends State<HomePage> {
                     padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
                     // margin: EdgeInsets.symmetric(vertical: 50),
                     decoration: BoxDecoration(
-                      color: Colors.lightBlue[800],
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: [0.5, 1.0],
+                        colors: [Color(0xFF0091FF), Color(0xFF0059FF)],
+                      ),
+                      //color: Color(0xFF0091FF),
                       borderRadius: BorderRadius.circular(17),
                     ),
                     child: Center(
@@ -190,55 +241,61 @@ class _HomePageState extends State<HomePage> {
             right: 20,
             left: 20,
             top: top + 75,
-            duration: Duration(milliseconds: 500),
+            duration: Duration(milliseconds: 700),
             curve: Curves.easeInCirc,
             child: GestureDetector(
-                onVerticalDragStart: (context) {
-                  setState(() {
-                    if (_isUp) {
-                      bottom2 = -10.0;
-                      right2 = 0.0;
-                      left2 = 0.0;
-                      top2 = 370.0;
+              onVerticalDragStart: (context) {
+                setState(() {
+                  if (_isUp) {
+                    bottom2 = -10.0;
+                    right2 = 0.0;
+                    left2 = 0.0;
+                    top2 = 270.0;
 
-                      bottom = 290.0;
-                      right = 50.0;
-                      left = 50.0;
-                      top = 250;
+                    bottom = 390.0;
+                    right = 50.0;
+                    left = 50.0;
+                    top = 150;
 
-                      _isUp = !_isUp;
-                    } else {
-                      bottom2 = -400.0;
-                      right2 = 0.0;
-                      left2 = 0.0;
-                      top2 = 590;
+                    bottom3 = 390.0;
+                    right3 = 0.0;
+                    left3 = 0.0;
+                    top3 = -10.0;
 
-                      bottom = 70.0;
-                      right = 10.0;
-                      left = 10.0;
-                      top = 470;
+                    _isUp = !_isUp;
+                  } else {
+                    bottom2 = -10.0;
+                    right2 = 0.0;
+                    left2 = 0.0;
+                    top2 = 590;
 
-                      _isUp = !_isUp;
-                    }
-                  });
-                },
-                child: Row(
-                  children: <Widget>[
-                    Image.asset("assets/leaderboard.png"),
-                    SizedBox(width: 30),
-                    Container(
-                      padding: EdgeInsets.only(top: 15),
-                      child: Text(
-                        "LEADERBOARD",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 27,
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
+                    bottom = 70.0;
+                    right = 10.0;
+                    left = 10.0;
+                    top = 470;
+
+                    bottom3 = 630.0;
+                    right3 = 0.0;
+                    left3 = 0.0;
+                    top3 = -10.0;
+
+                    _isUp = !_isUp;
+                  }
+                });
+              },
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: 30,
+                  ),
+                  Image.asset("assets/leaderboard.png"),
+                  SizedBox(
+                    width: 110,
+                  ),
+                  Image.asset("assets/instructions.png")
+                ],
+              ),
+            ),
           ),
         ],
       ),
