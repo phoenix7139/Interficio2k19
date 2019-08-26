@@ -63,6 +63,12 @@ class _HomePageState extends State<HomePage> {
   var left3 = 0.0;
   var top3 = -10.0;
 
+  var bottom4 = 15.0;
+  var right4 = 20.0;
+  var top4 = 525.0;
+
+  var iconSize = 80.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,12 +87,12 @@ class _HomePageState extends State<HomePage> {
             right: right3,
             left: left3,
             top: top3,
-            duration: Duration(milliseconds: 700),
-            curve: Curves.easeInCirc,
+            duration: Duration(milliseconds: 900),
+            curve: Curves.easeOutQuart,
             child: Center(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 700),
-                curve: Curves.easeInCirc,
+                duration: Duration(milliseconds: 900),
+                curve: Curves.easeOutQuart,
                 opacity: _isUp ? 0.5 : 0.8,
                 child: Container(
                   padding: EdgeInsets.all(20),
@@ -123,12 +129,12 @@ class _HomePageState extends State<HomePage> {
             right: right,
             left: left,
             top: top,
-            duration: Duration(milliseconds: 700),
-            curve: Curves.easeInCirc,
+            duration: Duration(milliseconds: 900),
+            curve: Curves.easeOutQuart,
             child: Center(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 700),
-                curve: Curves.easeInCirc,
+                duration: Duration(milliseconds: 900),
+                curve: Curves.easeOutQuart,
                 opacity: _isUp ? 0.7 : 0.0,
                 child: Container(
                   padding: EdgeInsets.all(20),
@@ -152,12 +158,12 @@ class _HomePageState extends State<HomePage> {
             right: right2,
             left: left2,
             top: top2,
-            duration: Duration(milliseconds: 700),
-            curve: Curves.easeInCirc,
+            duration: Duration(milliseconds: 900),
+            curve: Curves.easeOutQuart,
             child: Center(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 700),
-                curve: Curves.easeInCirc,
+                duration: Duration(milliseconds: 900),
+                curve: Curves.easeOutQuart,
                 opacity: _isUp ? 0.5 : 0.8,
                 child: GestureDetector(
                   onVerticalDragStart: (context) {
@@ -178,6 +184,10 @@ class _HomePageState extends State<HomePage> {
                         left3 = 0.0;
                         top3 = -10.0;
 
+                        bottom4 = 560;
+                        right4 = 10;
+                        top4 = 20;
+
                         _isUp = !_isUp;
                       } else {
                         bottom2 = -10.0;
@@ -194,6 +204,10 @@ class _HomePageState extends State<HomePage> {
                         right3 = 0.0;
                         left3 = 0.0;
                         top3 = -10.0;
+
+                        bottom4 = 15;
+                        right4 = 20;
+                        top4 = 525;
 
                         _isUp = !_isUp;
                       }
@@ -238,11 +252,10 @@ class _HomePageState extends State<HomePage> {
           ),
           AnimatedPositioned(
             bottom: bottom - 55,
-            right: 20,
             left: 20,
             top: top + 75,
-            duration: Duration(milliseconds: 700),
-            curve: Curves.easeInCirc,
+            duration: Duration(milliseconds: 1200),
+            curve: Curves.easeOutQuart,
             child: GestureDetector(
               onVerticalDragStart: (context) {
                 setState(() {
@@ -262,6 +275,10 @@ class _HomePageState extends State<HomePage> {
                     left3 = 0.0;
                     top3 = -10.0;
 
+                    bottom4 = 560;
+                    right4 = 10;
+                    top4 = 20;
+
                     _isUp = !_isUp;
                   } else {
                     bottom2 = -10.0;
@@ -279,22 +296,76 @@ class _HomePageState extends State<HomePage> {
                     left3 = 0.0;
                     top3 = -10.0;
 
+                    bottom4 = 15;
+                    right4 = 20;
+                    top4 = 525;
+
                     _isUp = !_isUp;
                   }
                 });
               },
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: 30,
-                  ),
-                  Image.asset("assets/leaderboard.png"),
-                  SizedBox(
-                    width: 110,
-                  ),
-                  Image.asset("assets/instructions.png")
-                ],
+              child: Image.asset("assets/leaderboard.png"),
+            ),
+          ),
+          AnimatedPositioned(
+            bottom: bottom4,
+            right: right4,
+            duration: Duration(milliseconds: 1200),
+            curve: Curves.easeOutQuart,
+            child: GestureDetector(
+              onVerticalDragStart: (context) {
+                setState(() {
+                  if (_isUp) {
+                    bottom2 = -10.0;
+                    right2 = 0.0;
+                    left2 = 0.0;
+                    top2 = 270.0;
+
+                    bottom = 390.0;
+                    right = 50.0;
+                    left = 50.0;
+                    top = 150;
+
+                    bottom3 = 390.0;
+                    right3 = 0.0;
+                    left3 = 0.0;
+                    top3 = -10.0;
+
+                    bottom4 = 560;
+                    right4 = 10;
+                    top4 = 20;
+
+                    _isUp = !_isUp;
+                  } else {
+                    bottom2 = -10.0;
+                    right2 = 0.0;
+                    left2 = 0.0;
+                    top2 = 590;
+
+                    bottom = 70.0;
+                    right = 10.0;
+                    left = 10.0;
+                    top = 470;
+
+                    bottom3 = 630.0;
+                    right3 = 0.0;
+                    left3 = 0.0;
+                    top3 = -10.0;
+
+                    bottom4 = 15;
+                    right4 = 20;
+                    top4 = 535;
+
+                    _isUp = !_isUp;
+                  }
+                });
+              },
+              child: Icon(
+                Icons.info,
+                size: 80,
               ),
+
+              //Image.asset("assets/instructions.png"),
             ),
           ),
         ],
