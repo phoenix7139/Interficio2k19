@@ -5,6 +5,8 @@ import 'package:location/location.dart';
 import 'package:latlong/latlong.dart' as ll;
 
 class HomePage extends StatefulWidget {
+  HomePage();
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -12,6 +14,8 @@ class HomePage extends StatefulWidget {
 GoogleMapController mapController;
 
 class _HomePageState extends State<HomePage> {
+  _HomePageState();
+
   var currentLocation = LocationData;
   var location = new Location();
   var lat, long, accuracy;
@@ -48,29 +52,21 @@ class _HomePageState extends State<HomePage> {
 
   bool _isUp = true;
 
-  var bottom = 70.0;
-  var right = 10.0;
-  var left = 10.0;
-  var top = 470.0;
-
-  var bottom2 = -10.0;
-  var right2 = 0.0;
-  var left2 = 0.0;
-  var top2 = 590.0;
-
-  var bottom3 = 630.0;
-  var right3 = 0.0;
-  var left3 = 0.0;
-  var top3 = -10.0;
-
-  var bottom4 = 15.0;
-  var right4 = 20.0;
-  var top4 = 525.0;
-
-  var iconSize = 80.0;
-
   @override
   Widget build(BuildContext context) {
+    var deviceSize = MediaQuery.of(context).size;
+
+    double bottom = _isUp ? 55.0 : (deviceSize.height / 2);
+    double top = _isUp ? (deviceSize.height - 145) : bottom;
+
+    double top2 =
+        _isUp ? (deviceSize.height - 35) : ((deviceSize.height) / 2) + 10;
+
+    var bottom3 = _isUp ? deviceSize.height : ((deviceSize.height) / 2) + 10;
+
+    var bottom4 = _isUp ? 10.0 : deviceSize.height - 80;
+    var right4 = 20.0;
+
     return Scaffold(
       drawer: Drawer(
         child: Text("drawer"),
@@ -84,9 +80,9 @@ class _HomePageState extends State<HomePage> {
           GameMap(),
           AnimatedPositioned(
             bottom: bottom3,
-            right: right3,
-            left: left3,
-            top: top3,
+            right: 0.0,
+            left: 0.0,
+            top: -15.0,
             duration: Duration(milliseconds: 900),
             curve: Curves.easeOutQuart,
             child: Center(
@@ -113,6 +109,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(17),
                   ),
                   child: Container(
+                    padding: EdgeInsets.fromLTRB(10, 25, 10, 10),
                     alignment: Alignment.topLeft,
                     child: Text(
                       "INSTRUCTIONS",
@@ -126,8 +123,8 @@ class _HomePageState extends State<HomePage> {
           ),
           AnimatedPositioned(
             bottom: bottom,
-            right: right,
-            left: left,
+            right: 10.0,
+            left: 10.0,
             top: top,
             duration: Duration(milliseconds: 900),
             curve: Curves.easeOutQuart,
@@ -154,9 +151,9 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           AnimatedPositioned(
-            bottom: bottom2,
-            right: right2,
-            left: left2,
+            bottom: -15.0,
+            right: 0.0,
+            left: 0.0,
             top: top2,
             duration: Duration(milliseconds: 900),
             curve: Curves.easeOutQuart,
@@ -169,45 +166,27 @@ class _HomePageState extends State<HomePage> {
                   onVerticalDragStart: (context) {
                     setState(() {
                       if (_isUp) {
-                        bottom2 = -10.0;
-                        right2 = 0.0;
-                        left2 = 0.0;
-                        top2 = 270.0;
+                        top2 = ((deviceSize.height) / 2) + 10;
 
-                        bottom = 390.0;
-                        right = 50.0;
-                        left = 50.0;
-                        top = 150;
+                        bottom = 55;
+                        top = deviceSize.height - 145;
 
-                        bottom3 = 390.0;
-                        right3 = 0.0;
-                        left3 = 0.0;
-                        top3 = -10.0;
+                        bottom3 = deviceSize.height;
 
-                        bottom4 = 560;
+                        bottom4 = 10;
                         right4 = 10;
-                        top4 = 20;
 
                         _isUp = !_isUp;
                       } else {
-                        bottom2 = -10.0;
-                        right2 = 0.0;
-                        left2 = 0.0;
-                        top2 = 590.0;
+                        top2 = (deviceSize.height - 35);
 
-                        bottom = 70.0;
-                        right = 10.0;
-                        left = 10.0;
-                        top = 470;
+                        bottom = deviceSize.height / 2;
+                        top = bottom;
 
-                        bottom3 = 630.0;
-                        right3 = 0.0;
-                        left3 = 0.0;
-                        top3 = -10.0;
+                        bottom3 = ((deviceSize.height) / 2) + 10;
 
-                        bottom4 = 15;
+                        bottom4 = deviceSize.height - 80;
                         right4 = 20;
-                        top4 = 525;
 
                         _isUp = !_isUp;
                       }
@@ -251,54 +230,36 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           AnimatedPositioned(
-            bottom: bottom - 55,
+            bottom: deviceSize.height - top2 - 25,
             left: 20,
-            top: top + 75,
+            top: top2 - 35,
             duration: Duration(milliseconds: 1200),
             curve: Curves.easeOutQuart,
             child: GestureDetector(
               onVerticalDragStart: (context) {
                 setState(() {
                   if (_isUp) {
-                    bottom2 = -10.0;
-                    right2 = 0.0;
-                    left2 = 0.0;
-                    top2 = 270.0;
+                    top2 = (deviceSize.height) / 2 + 10;
 
-                    bottom = 390.0;
-                    right = 50.0;
-                    left = 50.0;
-                    top = 150;
+                    bottom = 55;
+                    top = deviceSize.height - 145;
 
-                    bottom3 = 390.0;
-                    right3 = 0.0;
-                    left3 = 0.0;
-                    top3 = -10.0;
+                    bottom3 = deviceSize.height;
 
-                    bottom4 = 560;
+                    bottom4 = 10;
                     right4 = 10;
-                    top4 = 20;
 
                     _isUp = !_isUp;
                   } else {
-                    bottom2 = -10.0;
-                    right2 = 0.0;
-                    left2 = 0.0;
-                    top2 = 590;
+                    top2 = deviceSize.height - 35;
 
-                    bottom = 70.0;
-                    right = 10.0;
-                    left = 10.0;
-                    top = 470;
+                    bottom = deviceSize.height / 2;
+                    top = bottom;
 
-                    bottom3 = 630.0;
-                    right3 = 0.0;
-                    left3 = 0.0;
-                    top3 = -10.0;
+                    bottom3 = ((deviceSize.height) / 2) + 10;
 
-                    bottom4 = 15;
+                    bottom4 = deviceSize.height - 80;
                     right4 = 20;
-                    top4 = 525;
 
                     _isUp = !_isUp;
                   }
@@ -316,45 +277,27 @@ class _HomePageState extends State<HomePage> {
               onVerticalDragStart: (context) {
                 setState(() {
                   if (_isUp) {
-                    bottom2 = -10.0;
-                    right2 = 0.0;
-                    left2 = 0.0;
-                    top2 = 270.0;
+                    top2 = (deviceSize.height) / 2 + 10;
 
-                    bottom = 390.0;
-                    right = 50.0;
-                    left = 50.0;
-                    top = 150;
+                    bottom = 55;
+                    top = deviceSize.height - 145;
 
-                    bottom3 = 390.0;
-                    right3 = 0.0;
-                    left3 = 0.0;
-                    top3 = -10.0;
+                    bottom3 = deviceSize.height;
 
-                    bottom4 = 560;
+                    bottom4 = 10;
                     right4 = 10;
-                    top4 = 20;
 
                     _isUp = !_isUp;
                   } else {
-                    bottom2 = -10.0;
-                    right2 = 0.0;
-                    left2 = 0.0;
-                    top2 = 590;
+                    top2 = deviceSize.height - 35;
 
-                    bottom = 70.0;
-                    right = 10.0;
-                    left = 10.0;
-                    top = 470;
+                    bottom = deviceSize.height / 2;
+                    top = bottom;
 
-                    bottom3 = 630.0;
-                    right3 = 0.0;
-                    left3 = 0.0;
-                    top3 = -10.0;
+                    bottom3 = ((deviceSize.height) / 2) + 10;
 
-                    bottom4 = 15;
+                    bottom4 = deviceSize.height - 80;
                     right4 = 20;
-                    top4 = 535;
 
                     _isUp = !_isUp;
                   }
@@ -362,7 +305,7 @@ class _HomePageState extends State<HomePage> {
               },
               child: Icon(
                 Icons.info,
-                size: 80,
+                size: 70,
               ),
 
               //Image.asset("assets/instructions.png"),
