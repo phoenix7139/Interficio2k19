@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:latlong/latlong.dart' as ll;
+// import 'package:latlong/latlong.dart' as ll;
 
 class HomePage extends StatefulWidget {
   HomePage();
@@ -37,11 +37,11 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           lat = currentLocation.latitude;
           long = currentLocation.longitude;
-          ll.Distance distance = new ll.Distance();
-          meter1 = distance(
-              new ll.LatLng(lat, long), new ll.LatLng(corlat, corlong));
-          meter2 = distance(
-              new ll.LatLng(lat, long), new ll.LatLng(ovallat, ovallong));
+          // ll.Distance distance = new ll.Distance();
+          // meter1 = distance(
+          //     new ll.LatLng(lat, long), new ll.LatLng(corlat, corlong));
+          // meter2 = distance(
+          //     new ll.LatLng(lat, long), new ll.LatLng(ovallat, ovallong));
           accuracy = currentLocation.accuracy;
           // print(lat);
           // print(long);
