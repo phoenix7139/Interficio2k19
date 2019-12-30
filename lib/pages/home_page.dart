@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -28,10 +32,25 @@ class _HomePageState extends State<HomePage> {
 
   var meter1, meter2;
 
+  var data;
+  var level = "level";
+
+  Future<String> getData() async {
+    http.Response response =
+        await http.get(Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"), headers: {
+      "Authorization":
+          "Token d478cb49265a5b0317f80a690363c40dbaa4813b87643e9a464711bcf4c9f6d7"
+    });
+    data = json.decode(response.body);
+    print(data);
+    level = data["title"];
+  }
+
   @override
   void initState() {
     super.initState();
     {
+      getData();
       location.changeSettings(accuracy: LocationAccuracy.HIGH);
       location.onLocationChanged().listen((LocationData currentLocation) {
         setState(() {
@@ -141,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Center(
                     child: Text(
-                      "INTERFICIO",
+                      level,
                       style:
                           TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),
