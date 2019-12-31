@@ -24,43 +24,47 @@ class _HomePageState extends State<HomePage> {
   var location = new Location();
   var lat, long, accuracy;
 
-  var corlat = 23.547771;
-  var corlong = 87.289857;
+  Map<String, dynamic> levelData = {
+    "pause_bool": false,
+    "map_hint": false,
+    "level_no": 0,
+    "title": "",
+    "ques": "",
+    "map_bool": false
+  };
 
-  var ovallat = 23.549896;
-  var ovallong = 87.291763;
-
-  var meter1, meter2;
-
-  var data;
-  var level = "level";
-
-  Future<String> getData() async {
-    http.Response response =
-        await http.get(Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"), headers: {
+  Future getLevelData() async {
+    http.Response response = await http
+        .get(Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"), headers: {
       "Authorization":
-          "Token d478cb49265a5b0317f80a690363c40dbaa4813b87643e9a464711bcf4c9f6d7"
+          "Token 57e8b2723840343502eda398c6b5c1522ffe5e54fe26151b82518bf884419925"
     });
-    data = json.decode(response.body);
-    print(data);
-    level = data["title"];
+    levelData = json.decode(response.body);
+    print(levelData);
+  }
+
+  Future submitLevelAnswer() async {}
+
+  Future getScoreboard() async {
+    http.Response response = await http
+        .get(Uri.encodeFull("http://10.0.2.2:8000/api/scoreboard/"), headers: {
+      "Authorization":
+          "Token 57e8b2723840343502eda398c6b5c1522ffe5e54fe26151b82518bf884419925"
+    });
+    print(json.decode(response.body));
   }
 
   @override
   void initState() {
     super.initState();
     {
-      getData();
+      getLevelData();
+      getScoreboard();
       location.changeSettings(accuracy: LocationAccuracy.HIGH);
       location.onLocationChanged().listen((LocationData currentLocation) {
         setState(() {
           lat = currentLocation.latitude;
           long = currentLocation.longitude;
-          // ll.Distance distance = new ll.Distance();
-          // meter1 = distance(
-          //     new ll.LatLng(lat, long), new ll.LatLng(corlat, corlong));
-          // meter2 = distance(
-          //     new ll.LatLng(lat, long), new ll.LatLng(ovallat, ovallong));
           accuracy = currentLocation.accuracy;
           // print(lat);
           // print(long);
@@ -70,13 +74,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool _isUp = true;
+  bool _isOpen = false;
 
   @override
   Widget build(BuildContext context) {
     var deviceSize = MediaQuery.of(context).size;
 
     double bottom = _isUp ? 55.0 : (deviceSize.height / 2);
-    double top = _isUp ? (deviceSize.height - 145) : bottom;
+    double top = _isUp
+        ? (_isOpen ? deviceSize.height / 2 : (deviceSize.height - 145))
+        : bottom;
 
     double top2 =
         _isUp ? (deviceSize.height - 35) : ((deviceSize.height) / 2) + 10;
@@ -146,24 +153,93 @@ class _HomePageState extends State<HomePage> {
             left: 10.0,
             top: top,
             duration: Duration(milliseconds: 900),
-            curve: Curves.easeOutQuart,
+            curve: Curves.bounceOut,
             child: Center(
               child: AnimatedOpacity(
                 duration: Duration(milliseconds: 900),
                 curve: Curves.easeOutQuart,
-                opacity: _isUp ? 0.7 : 0.0,
-                child: Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(17),
-                  ),
-                  child: Center(
-                    child: Text(
-                      level,
-                      style:
-                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                opacity: _isUp ? (_isOpen ? 0.9 : 0.7) : 0.0,
+                child: GestureDetector(
+                  onTap: () {
+                    _isOpen = !_isOpen;
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(17),
                     ),
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          top: 0.0,
+                          left: 115.0,
+                          child: Text(
+                            levelData["title"] == null
+                                ? "please wait"
+                                : levelData["title"],
+                            style: TextStyle(
+                              color: _isOpen ? Color(0xFF0059B3) : Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          AnimatedPositioned(
+            top: _isOpen
+                ? deviceSize.height / 2 + 60.0
+                : deviceSize.height + 5.0,
+            bottom: _isOpen ? 65.0 : -5.0,
+            left: 20.0,
+            right: 20.0,
+            duration: Duration(milliseconds: 900),
+            curve: Curves.easeOutQuart,
+            child: Container(
+              child: Center(
+                child: ScrollConfiguration(
+                  behavior: MyBehavior(),
+                  child: ListView(
+                    children: <Widget>[
+                      ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 7, horizontal: 7),
+                        title: Text(
+                          levelData["ques"],
+                          style: TextStyle(
+                              color: _isOpen ? Color(0xFF0091CC) : Colors.white,
+                              fontSize: 17,
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      ListTile(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 7),
+                        title: TextField(
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                          decoration: InputDecoration(
+                            suffixIcon: Icon(Icons.question_answer),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.5),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            labelText: 'answer here',
+                            // filled: true,
+                            // fillColor: Colors.white.withOpacity(0.2),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -184,36 +260,11 @@ class _HomePageState extends State<HomePage> {
                 child: GestureDetector(
                   onVerticalDragStart: (context) {
                     setState(() {
-                      if (_isUp) {
-                        top2 = ((deviceSize.height) / 2) + 10;
-
-                        bottom = 55;
-                        top = deviceSize.height - 145;
-
-                        bottom3 = deviceSize.height;
-
-                        bottom4 = 10;
-                        right4 = 10;
-
-                        _isUp = !_isUp;
-                      } else {
-                        top2 = (deviceSize.height - 35);
-
-                        bottom = deviceSize.height / 2;
-                        top = bottom;
-
-                        bottom3 = ((deviceSize.height) / 2) + 10;
-
-                        bottom4 = deviceSize.height - 80;
-                        right4 = 20;
-
-                        _isUp = !_isUp;
-                      }
+                      _isUp = !_isUp;
                     });
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-                    // margin: EdgeInsets.symmetric(vertical: 50),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -221,14 +272,12 @@ class _HomePageState extends State<HomePage> {
                         stops: [0.5, 1.0],
                         colors: [Color(0xFF0091FF), Color(0xFF0059FF)],
                       ),
-                      //color: Color(0xFF0091FF),
                       borderRadius: BorderRadius.circular(17),
                     ),
                     child: Center(
                       child: ScrollConfiguration(
                         behavior: MyBehavior(),
                         child: ListView(
-                          // mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             ListTile(
                               leading: Text("LATITUDE: $lat"),
@@ -257,31 +306,7 @@ class _HomePageState extends State<HomePage> {
             child: GestureDetector(
               onVerticalDragStart: (context) {
                 setState(() {
-                  if (_isUp) {
-                    top2 = (deviceSize.height) / 2 + 10;
-
-                    bottom = 55;
-                    top = deviceSize.height - 145;
-
-                    bottom3 = deviceSize.height;
-
-                    bottom4 = 10;
-                    right4 = 10;
-
-                    _isUp = !_isUp;
-                  } else {
-                    top2 = deviceSize.height - 35;
-
-                    bottom = deviceSize.height / 2;
-                    top = bottom;
-
-                    bottom3 = ((deviceSize.height) / 2) + 10;
-
-                    bottom4 = deviceSize.height - 80;
-                    right4 = 20;
-
-                    _isUp = !_isUp;
-                  }
+                  _isUp = !_isUp;
                 });
               },
               child: Image.asset("assets/leaderboard.png"),
@@ -295,39 +320,13 @@ class _HomePageState extends State<HomePage> {
             child: GestureDetector(
               onVerticalDragStart: (context) {
                 setState(() {
-                  if (_isUp) {
-                    top2 = (deviceSize.height) / 2 + 10;
-
-                    bottom = 55;
-                    top = deviceSize.height - 145;
-
-                    bottom3 = deviceSize.height;
-
-                    bottom4 = 10;
-                    right4 = 10;
-
-                    _isUp = !_isUp;
-                  } else {
-                    top2 = deviceSize.height - 35;
-
-                    bottom = deviceSize.height / 2;
-                    top = bottom;
-
-                    bottom3 = ((deviceSize.height) / 2) + 10;
-
-                    bottom4 = deviceSize.height - 80;
-                    right4 = 20;
-
-                    _isUp = !_isUp;
-                  }
+                  _isUp = !_isUp;
                 });
               },
               child: Icon(
                 Icons.info,
                 size: 70,
               ),
-
-              //Image.asset("assets/instructions.png"),
             ),
           ),
         ],
