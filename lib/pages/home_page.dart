@@ -24,34 +24,84 @@ class _HomePageState extends State<HomePage> {
   var location = new Location();
   var lat, long, accuracy;
 
-  Map<String, dynamic> levelData = {
-    "pause_bool": false,
-    "map_hint": false,
-    "level_no": 0,
-    "title": "",
-    "ques": "",
-    "map_bool": false
-  };
+  Map<String, dynamic> levelData = {};
+  List<dynamic> leaderboard;
+
+  var userToken =
+      "334b88e4be964a1dec398cac9c5c9699841750b1b6bac8be82c745041aa4c277";
+
+  final _answerFieldController = TextEditingController();
+
+  final _fieldFocusNode = new FocusNode();
 
   Future getLevelData() async {
-    http.Response response = await http
-        .get(Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"), headers: {
-      "Authorization":
-          "Token 57e8b2723840343502eda398c6b5c1522ffe5e54fe26151b82518bf884419925"
-    });
+    http.Response response = await http.get(
+        Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"),
+        headers: {"Authorization": "Token $userToken"});
     levelData = json.decode(response.body);
-    print(levelData);
   }
 
-  Future submitLevelAnswer() async {}
-
   Future getScoreboard() async {
-    http.Response response = await http
-        .get(Uri.encodeFull("http://10.0.2.2:8000/api/scoreboard/"), headers: {
-      "Authorization":
-          "Token 57e8b2723840343502eda398c6b5c1522ffe5e54fe26151b82518bf884419925"
+    http.Response response = await http.get(
+        Uri.encodeFull("http://10.0.2.2:8000/api/scoreboard/"),
+        headers: {"Authorization": "Token $userToken"});
+    leaderboard = json.decode(response.body);
+  }
+
+  Future submitLevelAnswer(answer) async {
+    http.Response response = await http.post(
+      Uri.encodeFull("http://10.0.2.2:8000/api/submit/ans/"),
+      headers: {
+        "Authorization": "Token $userToken",
+        "Content-Type": "application/json"
+      },
+      body: json.encode({
+        "answer": answer,
+        "level_no": levelData["level_no"],
+      }),
+    );
+    var data = json.decode(response.body);
+
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(data["success"] == false ? "try again" : "correct answer"),
+      duration: Duration(seconds: 1),
+    ));
+    setState(() {
+      _answerFieldController.clear();
+      getLevelData();
     });
-    print(json.decode(response.body));
+  }
+
+  Future submitLocation() async {
+    http.Response response = await http.post(
+      Uri.encodeFull("http://10.0.2.2:8000/api/submit/location/"),
+      headers: {
+        "Authorization": "Token $userToken",
+        "Content-Type": "application/json"
+      },
+      body: json.encode({
+        "lat": lat,
+        "long": long,
+        "level_no": levelData["level_no"],
+      }),
+    );
+    var data = json.decode(response.body);
+    print(data);
+
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content:
+          Text(data["success"] == false ? "try again" : "correct location"),
+      duration: Duration(seconds: 1),
+    ));
+    setState(() {
+      getLevelData();
+    });
+  }
+
+  @override
+  void dispose() {
+    _answerFieldController.dispose();
+    super.dispose();
   }
 
   @override
@@ -76,13 +126,15 @@ class _HomePageState extends State<HomePage> {
   bool _isUp = true;
   bool _isOpen = false;
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     var deviceSize = MediaQuery.of(context).size;
 
     double bottom = _isUp ? 55.0 : (deviceSize.height / 2);
     double top = _isUp
-        ? (_isOpen ? deviceSize.height / 2 : (deviceSize.height - 145))
+        ? (_isOpen ? deviceSize.height / 3 : (deviceSize.height - 145))
         : bottom;
 
     double top2 =
@@ -94,6 +146,8 @@ class _HomePageState extends State<HomePage> {
     var right4 = 20.0;
 
     return Scaffold(
+      key: _scaffoldKey,
+      resizeToAvoidBottomPadding: true,
       drawer: Drawer(
         child: Text("drawer"),
       ),
@@ -161,7 +215,9 @@ class _HomePageState extends State<HomePage> {
                 opacity: _isUp ? (_isOpen ? 0.9 : 0.7) : 0.0,
                 child: GestureDetector(
                   onTap: () {
-                    _isOpen = !_isOpen;
+                    setState(() {
+                      _isOpen = !_isOpen;
+                    });
                   },
                   child: Container(
                     padding: EdgeInsets.all(20),
@@ -173,16 +229,74 @@ class _HomePageState extends State<HomePage> {
                       children: <Widget>[
                         Positioned(
                           top: 0.0,
-                          left: 115.0,
-                          child: Text(
-                            levelData["title"] == null
-                                ? "please wait"
-                                : levelData["title"],
-                            style: TextStyle(
-                              color: _isOpen ? Color(0xFF0059B3) : Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          left: 0.0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Text(
+                                levelData["title"] == null
+                                    ? "please wait"
+                                    : levelData["title"],
+                                style: TextStyle(
+                                  color: _isOpen
+                                      ? Color(0xFF0059B3)
+                                      : Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20.0,
+                              ),
+                              levelData["title"] == null
+                                  ? FlatButton(
+                                      child: Icon(
+                                        Icons.refresh,
+                                        color:
+                                            Color(0xFF0091FF).withOpacity(0.7),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          getLevelData();
+                                        });
+                                      },
+                                    )
+                                  : levelData["map_hint"]
+                                      ? Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.location_on,
+                                              size: 28,
+                                            ),
+                                            SizedBox(
+                                              width: 50.0,
+                                            ),
+                                            Text(
+                                              "location hint",
+                                              style: TextStyle(
+                                                  color: Color(0xFF0091FF)
+                                                      .withOpacity(0.7)),
+                                            )
+                                          ],
+                                        )
+                                      : Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.assistant_photo,
+                                              size: 28,
+                                            ),
+                                            SizedBox(
+                                              width: 50.0,
+                                            ),
+                                            Text(
+                                              "main question",
+                                              style: TextStyle(
+                                                  color: Color(0xFF0091FF)
+                                                      .withOpacity(0.7)),
+                                            )
+                                          ],
+                                        ),
+                            ],
                           ),
                         ),
                       ],
@@ -192,59 +306,105 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          AnimatedPositioned(
-            top: _isOpen
-                ? deviceSize.height / 2 + 60.0
-                : deviceSize.height + 5.0,
-            bottom: _isOpen ? 65.0 : -5.0,
-            left: 20.0,
-            right: 20.0,
-            duration: Duration(milliseconds: 900),
-            curve: Curves.easeOutQuart,
-            child: Container(
-              child: Center(
-                child: ScrollConfiguration(
-                  behavior: MyBehavior(),
-                  child: ListView(
-                    children: <Widget>[
-                      ListTile(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 7, horizontal: 7),
-                        title: Text(
-                          levelData["ques"],
-                          style: TextStyle(
-                              color: _isOpen ? Color(0xFF0091CC) : Colors.white,
-                              fontSize: 17,
-                              fontStyle: FontStyle.italic),
+          levelData["title"] == null
+              ? Container()
+              : AnimatedPositioned(
+                  top: _isOpen && _isUp
+                      ? deviceSize.height / 3 + 60.0
+                      : deviceSize.height + 5.0,
+                  bottom: _isOpen && _isUp ? 75.0 : -5.0,
+                  left: 20.0,
+                  right: 20.0,
+                  duration: Duration(milliseconds: 900),
+                  curve: Curves.easeOutQuart,
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                    },
+                    child: Container(
+                      child: Center(
+                        child: ScrollConfiguration(
+                          behavior: MyBehavior(),
+                          child: ListView(
+                            children: <Widget>[
+                              ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 3, horizontal: 7),
+                                leading: levelData["map_hint"]
+                                    ? Text("LOCATION HINT")
+                                    : Text("QUESTION"),
+                              ),
+                              ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 7),
+                                title: Text(
+                                  levelData["ques"],
+                                  style: TextStyle(
+                                      color: _isOpen
+                                          ? Color(0xFF0091CC)
+                                          : Colors.white,
+                                      fontSize: 17,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                              ListTile(
+                                title: levelData["map_hint"]
+                                    ? Text(
+                                        "LATITUDE: $lat                                        LONGITUDE: $long")
+                                    : TextField(
+                                        focusNode: _fieldFocusNode,
+                                        controller: _answerFieldController,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                        decoration: InputDecoration(
+                                          filled: false,
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Color(0xFF0091CC),
+                                              width: 3.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color:
+                                                  Colors.white.withOpacity(0.5),
+                                              width: 3.0,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          labelText: 'answer here',
+                                          labelStyle: TextStyle(
+                                              color:
+                                                  Colors.white.withOpacity(0.5),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                //
+                              ),
+                              ListTile(
+                                title: FlatButton(
+                                  child: Text("SUBMIT"),
+                                  onPressed: () {
+                                    setState(() {
+                                      levelData["map_hint"]
+                                          ? submitLocation()
+                                          : submitLevelAnswer(
+                                              _answerFieldController.text);
+                                    });
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                      ListTile(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 15, horizontal: 7),
-                        title: TextField(
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(Icons.question_answer),
-                            filled: true,
-                            fillColor: Colors.white.withOpacity(0.5),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            labelText: 'answer here',
-                            // filled: true,
-                            // fillColor: Colors.white.withOpacity(0.2),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
           AnimatedPositioned(
             bottom: -15.0,
             right: 0.0,
@@ -261,6 +421,7 @@ class _HomePageState extends State<HomePage> {
                   onVerticalDragStart: (context) {
                     setState(() {
                       _isUp = !_isUp;
+                      getScoreboard();
                     });
                   },
                   child: Container(
@@ -275,21 +436,40 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(17),
                     ),
                     child: Center(
-                      child: ScrollConfiguration(
-                        behavior: MyBehavior(),
-                        child: ListView(
-                          children: <Widget>[
-                            ListTile(
-                              leading: Text("LATITUDE: $lat"),
-                            ),
-                            ListTile(
-                              leading: Text("LONGITUDE: $long"),
-                            ),
-                            ListTile(
-                              leading: Text("ACCURACY: $accuracy"),
-                            )
-                          ],
-                        ),
+                      child: ListView.builder(
+                        itemCount: leaderboard == null ? 0 : leaderboard.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "$index",
+                                    style: TextStyle(
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Text(
+                                    leaderboard[index]["name"],
+                                    style: TextStyle(
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "${leaderboard[index]["score"]}",
+                                style: TextStyle(
+                                    fontSize: 23, fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -307,6 +487,7 @@ class _HomePageState extends State<HomePage> {
               onVerticalDragStart: (context) {
                 setState(() {
                   _isUp = !_isUp;
+                  getScoreboard();
                 });
               },
               child: Image.asset("assets/leaderboard.png"),
@@ -321,6 +502,7 @@ class _HomePageState extends State<HomePage> {
               onVerticalDragStart: (context) {
                 setState(() {
                   _isUp = !_isUp;
+                  getScoreboard();
                 });
               },
               child: Icon(
