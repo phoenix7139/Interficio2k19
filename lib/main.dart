@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart' as prefix0;
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter/rendering.dart';
 
 import './pages/home_page.dart';
 import './pages/authentication.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   // debugPaintSizeEnabled = true;
@@ -33,6 +31,7 @@ class _MyAppState extends State<MyApp> {
 
   void autoAuthenticate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.clear();
     var _token = prefs.getString("token");
     if (_token != null) {
       setState(() {
@@ -45,7 +44,6 @@ class _MyAppState extends State<MyApp> {
       });
     }
   }
-
 
   @override
   void initState() {

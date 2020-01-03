@@ -47,7 +47,7 @@ class _AuthPageState extends State<AuthPage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-        Uri.encodeFull("http://10.0.2.2:8000/api/auth/login/"),
+        Uri.encodeFull("http://8f4420a0.ngrok.io/api/auth/login/"),
         headers: {"Content-Type": "application/json"},
         body: json.encode(_loginFormData));
     var data = json.decode(response.body);
@@ -87,7 +87,7 @@ class _AuthPageState extends State<AuthPage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-        Uri.encodeFull("http://10.0.2.2:8000/api/auth/register/"),
+        Uri.encodeFull("http://8f4420a0.ngrok.io/api/auth/register/"),
         headers: {"Content-Type": "application/json"},
         body: json.encode(_registerFormData));
     var data = json.decode(response.body);

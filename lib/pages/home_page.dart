@@ -17,6 +17,10 @@ class HomePage extends StatefulWidget {
 
 GoogleMapController mapController;
 
+String api_url = "8f4420a0.ngrok.io";
+
+bool header = false;
+
 class _HomePageState extends State<HomePage> {
   final Map<String, dynamic> user;
   _HomePageState(this.user);
@@ -35,13 +39,32 @@ class _HomePageState extends State<HomePage> {
 
   bool _isLoading = false;
 
+  void getLocation() async {
+    bool perm = await location.hasPermission();
+    print(perm);
+    LocationData currentLocation = await location.getLocation();
+    print(currentLocation.latitude);
+    print(currentLocation.longitude);
+    location.changeSettings(accuracy: LocationAccuracy.HIGH);
+    setState(() {
+      location.onLocationChanged().listen((LocationData currentLocation) {
+        setState(() {
+          print("hello");
+          lat = currentLocation.latitude;
+          long = currentLocation.longitude;
+          accuracy = currentLocation.accuracy;
+        });
+      });
+    });
+  }
+
 //this function retrieves the data of the current level of the user
   Future getLevelData() async {
     setState(() {
       _isLoading = true;
     });
     http.Response response = await http.get(
-        Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"),
+        Uri.encodeFull("http://8f4420a0.ngrok.io/api/getlevel/"),
         headers: {"Authorization": "Token ${user["token"]}"});
     levelData = json.decode(response.body);
     setState(() {
@@ -52,7 +75,7 @@ class _HomePageState extends State<HomePage> {
 //this function retrieves the current leaderboard
   Future getScoreboard() async {
     http.Response response = await http.get(
-        Uri.encodeFull("http://10.0.2.2:8000/api/scoreboard/"),
+        Uri.encodeFull("http://8f4420a0.ngrok.io/api/scoreboard/"),
         headers: {"Authorization": "Token ${user["token"]}"});
     leaderboard = json.decode(response.body);
   }
@@ -63,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-      Uri.encodeFull("http://10.0.2.2:8000/api/submit/ans/"),
+      Uri.encodeFull("http://8f4420a0.ngrok.io/api/submit/ans/"),
       headers: {
         "Authorization": "Token ${user["token"]}",
         "Content-Type": "application/json"
@@ -92,7 +115,7 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-      Uri.encodeFull("http://10.0.2.2:8000/api/submit/location/"),
+      Uri.encodeFull("http://8f4420a0.ngrok.io/api/submit/location/"),
       headers: {
         "Authorization": "Token ${user["token"]}",
         "Content-Type": "application/json"
@@ -124,15 +147,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     {
-      location.changeSettings(accuracy: LocationAccuracy.HIGH);
-      location.onLocationChanged().listen((LocationData currentLocation) {
-        setState(() {
-          lat = currentLocation.latitude;
-          long = currentLocation.longitude;
-          accuracy = currentLocation.accuracy;
-        });
-      });
-      
+      print("1");
+      getLocation();
+      print("2");
       getLevelData();
       getScoreboard();
     }
@@ -268,7 +285,7 @@ class _HomePageState extends State<HomePage> {
                                             Text(
                                               "location hint",
                                               style: TextStyle(
-                                                  color: Color(0xFFE000FF)
+                                                  color: Color(0xFFFFE000)
                                                       .withOpacity(0.7),
                                                   fontSize: 21),
                                             )
@@ -286,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                                             Text(
                                               "main question",
                                               style: TextStyle(
-                                                  color: Color(0xFFE000FF)
+                                                  color: Color(0xFFFFE000)
                                                       .withOpacity(0.7),
                                                   fontSize: 21),
                                             )
@@ -324,17 +341,16 @@ class _HomePageState extends State<HomePage> {
                           behavior: MyBehavior(),
                           child: ListView(
                             children: <Widget>[
-                              ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 3, horizontal: 7),
-                                leading: levelData["map_hint"]
-                                    ? Text("LOCATION HINT")
-                                    : Text("QUESTION"),
-                              ),
-                              ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 7, horizontal: 7),
-                                title: Text(
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFFFE000),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 15),
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 10),
+                                child: Text(
                                   levelData["ques"],
                                   style: TextStyle(
                                       color: _isOpen
@@ -346,8 +362,24 @@ class _HomePageState extends State<HomePage> {
                               ),
                               ListTile(
                                 title: levelData["map_hint"]
-                                    ? Text(
-                                        "LATITUDE: $lat                                        LONGITUDE: $long")
+                                    ? Container(
+                                        child: Center(
+                                          child: Column(
+                                            children: <Widget>[
+                                              ListTile(
+                                                leading: Icon(Icons
+                                                    .subdirectory_arrow_left),
+                                                title: Text("LATITUDE: $lat"),
+                                              ),
+                                              ListTile(
+                                                leading: Icon(Icons
+                                                    .subdirectory_arrow_right),
+                                                title: Text("LONGITUDE: $long"),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
                                     : TextField(
                                         focusNode: _fieldFocusNode,
                                         controller: _answerFieldController,
@@ -434,38 +466,67 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Center(
                       child: ListView.builder(
-                        itemCount: leaderboard == null ? 0 : leaderboard.length,
+                        itemCount:
+                            leaderboard == null ? 0 : leaderboard.length + 1,
                         itemBuilder: (BuildContext context, int index) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    "${leaderboard[index]["rank"]}",
-                                    style: TextStyle(
-                                        fontSize: 23,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Text(
-                                    leaderboard[index]["name"],
-                                    style: TextStyle(
-                                        fontSize: 23,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "${leaderboard[index]["score"]}",
-                                style: TextStyle(
-                                    fontSize: 23, fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          );
+                          if (index == 0) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(width: 40),
+                                      Text(
+                                        "name",
+                                        style: TextStyle(
+                                            fontSize: 31,
+                                            fontStyle: FontStyle.italic,
+                                            color: Color(0xFFFFE000)),
+                                      )
+                                    ]),
+                                Text(
+                                  "score",
+                                  style: TextStyle(
+                                      fontSize: 31,
+                                      fontStyle: FontStyle.italic,
+                                      color: Color(0xFFFFE000)),
+                                )
+                              ],
+                            );
+                          } else {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      "${index}",
+                                      style: TextStyle(
+                                          fontSize: 23,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Text(
+                                      leaderboard[index - 1]["name"],
+                                      style: TextStyle(
+                                          fontSize: 23,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  "${leaderboard[index - 1]["score"]}",
+                                  style: TextStyle(
+                                      fontSize: 23,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            );
+                          }
                         },
                       ),
                     ),
@@ -508,6 +569,15 @@ class _HomePageState extends State<HomePage> {
                 Icons.info,
                 size: 70,
               ),
+            ),
+          ),
+          Positioned(
+            top: 5,
+            left: 5,
+            child: Image.asset(
+              "assets/map.png",
+              width: 100,
+              height: 100,
             ),
           ),
         ],
