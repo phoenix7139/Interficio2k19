@@ -6,53 +6,66 @@ import 'package:http/http.dart' as http;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-// import 'package:latlong/latlong.dart' as ll;
 
 class HomePage extends StatefulWidget {
-  HomePage();
+  final Map<String, dynamic> user;
+  HomePage(this.user);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(user);
 }
 
 GoogleMapController mapController;
 
 class _HomePageState extends State<HomePage> {
-  _HomePageState();
+  final Map<String, dynamic> user;
+  _HomePageState(this.user);
 
   var currentLocation = LocationData;
   var location = new Location();
   var lat, long, accuracy;
 
-  Map<String, dynamic> levelData = {};
-  List<dynamic> leaderboard;
+  Map<String, dynamic> levelData = {}; //stores data of current level of user
+  List<dynamic> leaderboard; //stores the current leaderboard
 
-  var userToken =
-      "334b88e4be964a1dec398cac9c5c9699841750b1b6bac8be82c745041aa4c277";
+  final _answerFieldController =
+      TextEditingController(); //to retrieve textfield value
 
-  final _answerFieldController = TextEditingController();
+  final _fieldFocusNode = new FocusNode(); //to deselect answer textfield
 
-  final _fieldFocusNode = new FocusNode();
+  bool _isLoading = false;
 
+//this function retrieves the data of the current level of the user
   Future getLevelData() async {
+    setState(() {
+      _isLoading = true;
+    });
     http.Response response = await http.get(
         Uri.encodeFull("http://10.0.2.2:8000/api/getlevel/"),
-        headers: {"Authorization": "Token $userToken"});
+        headers: {"Authorization": "Token ${user["token"]}"});
     levelData = json.decode(response.body);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
+//this function retrieves the current leaderboard
   Future getScoreboard() async {
     http.Response response = await http.get(
         Uri.encodeFull("http://10.0.2.2:8000/api/scoreboard/"),
-        headers: {"Authorization": "Token $userToken"});
+        headers: {"Authorization": "Token ${user["token"]}"});
     leaderboard = json.decode(response.body);
   }
 
+//this functions submits an answer to the main question of a level
   Future submitLevelAnswer(answer) async {
+    setState(() {
+      _isLoading = true;
+    });
     http.Response response = await http.post(
       Uri.encodeFull("http://10.0.2.2:8000/api/submit/ans/"),
       headers: {
-        "Authorization": "Token $userToken",
+        "Authorization": "Token ${user["token"]}",
         "Content-Type": "application/json"
       },
       body: json.encode({
@@ -61,9 +74,10 @@ class _HomePageState extends State<HomePage> {
       }),
     );
     var data = json.decode(response.body);
+    print(data);
 
     _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text(data["success"] == false ? "try again" : "correct answer"),
+      content: Text(data["success"] == true ? "correct answer" : "try again"),
       duration: Duration(seconds: 1),
     ));
     setState(() {
@@ -72,11 +86,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+//this function submits the current location of the user
   Future submitLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
     http.Response response = await http.post(
       Uri.encodeFull("http://10.0.2.2:8000/api/submit/location/"),
       headers: {
-        "Authorization": "Token $userToken",
+        "Authorization": "Token ${user["token"]}",
         "Content-Type": "application/json"
       },
       body: json.encode({
@@ -86,11 +104,9 @@ class _HomePageState extends State<HomePage> {
       }),
     );
     var data = json.decode(response.body);
-    print(data);
 
     _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content:
-          Text(data["success"] == false ? "try again" : "correct location"),
+      content: Text(data["success"] == true ? "correct location" : "try again"),
       duration: Duration(seconds: 1),
     ));
     setState(() {
@@ -108,40 +124,38 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     {
-      getLevelData();
-      getScoreboard();
       location.changeSettings(accuracy: LocationAccuracy.HIGH);
       location.onLocationChanged().listen((LocationData currentLocation) {
         setState(() {
           lat = currentLocation.latitude;
           long = currentLocation.longitude;
           accuracy = currentLocation.accuracy;
-          // print(lat);
-          // print(long);
         });
       });
+      
+      getLevelData();
+      getScoreboard();
     }
   }
 
-  bool _isUp = true;
-  bool _isOpen = false;
+  bool _isUp =
+      true; //to maintain state of the animation of leaderboard, instruction sheet
+  bool _isOpen = false; //to maintain animation of question, answer box
 
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); //for bottomsnackbar
 
   @override
   Widget build(BuildContext context) {
     var deviceSize = MediaQuery.of(context).size;
 
+//animation using animatedpositioned. mean position toggle values
     double bottom = _isUp ? 55.0 : (deviceSize.height / 2);
     double top = _isUp
         ? (_isOpen ? deviceSize.height / 3 : (deviceSize.height - 145))
         : bottom;
-
     double top2 =
         _isUp ? (deviceSize.height - 35) : ((deviceSize.height) / 2) + 10;
-
     var bottom3 = _isUp ? deviceSize.height : ((deviceSize.height) / 2) + 10;
-
     var bottom4 = _isUp ? 10.0 : deviceSize.height - 80;
     var right4 = 20.0;
 
@@ -151,14 +165,11 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: Text("drawer"),
       ),
-      // appBar: AppBar(
-      //   title: Text("Home"),
-      //   backgroundColor: Colors.black,
-      // ),
       body: Stack(
         children: <Widget>[
-          GameMap(),
+          GameMap(), //google map as main background of the app
           AnimatedPositioned(
+            //top instructions panel
             bottom: bottom3,
             right: 0.0,
             left: 0.0,
@@ -173,19 +184,12 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    // gradient: LinearGradient(
-                    //   begin: Alignment.topCenter,
-                    //   end: Alignment.bottomCenter,
-                    //   stops: [0.5, 1.0],
-                    //   colors: [Colors.green, Colors.lightGreen],
-                    // ),
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       stops: [0.7, 1.0],
                       colors: [Colors.black, Colors.grey],
                     ),
-                    // color: Colors.black,
                     borderRadius: BorderRadius.circular(17),
                   ),
                   child: Container(
@@ -202,6 +206,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           AnimatedPositioned(
+            //level box displayed on home page
             bottom: bottom,
             right: 10.0,
             left: 10.0,
@@ -233,34 +238,23 @@ class _HomePageState extends State<HomePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              Text(
-                                levelData["title"] == null
-                                    ? "please wait"
-                                    : levelData["title"],
-                                style: TextStyle(
-                                  color: _isOpen
-                                      ? Color(0xFF0059B3)
-                                      : Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              levelData["title"] == null
+                                  ? Container()
+                                  : Text(
+                                      levelData["title"],
+                                      style: TextStyle(
+                                        color: _isOpen
+                                            ? Color(0xFF0059B3)
+                                            : Colors.white,
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                               SizedBox(
                                 width: 20.0,
                               ),
                               levelData["title"] == null
-                                  ? FlatButton(
-                                      child: Icon(
-                                        Icons.refresh,
-                                        color:
-                                            Color(0xFF0091FF).withOpacity(0.7),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          getLevelData();
-                                        });
-                                      },
-                                    )
+                                  ? Container()
                                   : levelData["map_hint"]
                                       ? Row(
                                           children: <Widget>[
@@ -274,8 +268,9 @@ class _HomePageState extends State<HomePage> {
                                             Text(
                                               "location hint",
                                               style: TextStyle(
-                                                  color: Color(0xFF0091FF)
-                                                      .withOpacity(0.7)),
+                                                  color: Color(0xFFE000FF)
+                                                      .withOpacity(0.7),
+                                                  fontSize: 21),
                                             )
                                           ],
                                         )
@@ -291,8 +286,9 @@ class _HomePageState extends State<HomePage> {
                                             Text(
                                               "main question",
                                               style: TextStyle(
-                                                  color: Color(0xFF0091FF)
-                                                      .withOpacity(0.7)),
+                                                  color: Color(0xFFE000FF)
+                                                      .withOpacity(0.7),
+                                                  fontSize: 21),
                                             )
                                           ],
                                         ),
@@ -309,6 +305,7 @@ class _HomePageState extends State<HomePage> {
           levelData["title"] == null
               ? Container()
               : AnimatedPositioned(
+                  //question along with textfield for answer and submit button
                   top: _isOpen && _isUp
                       ? deviceSize.height / 3 + 60.0
                       : deviceSize.height + 5.0,
@@ -383,7 +380,6 @@ class _HomePageState extends State<HomePage> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                //
                               ),
                               ListTile(
                                 title: FlatButton(
@@ -406,6 +402,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
           AnimatedPositioned(
+            //leaderboard generated dynamically using listview.builder
             bottom: -15.0,
             right: 0.0,
             left: 0.0,
@@ -446,7 +443,7 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
-                                    "$index",
+                                    "${leaderboard[index]["rank"]}",
                                     style: TextStyle(
                                         fontSize: 23,
                                         fontWeight: FontWeight.bold),
@@ -478,6 +475,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           AnimatedPositioned(
+            //leaderboard icon that triggers animation
             bottom: deviceSize.height - top2 - 25,
             left: 20,
             top: top2 - 35,
@@ -494,6 +492,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           AnimatedPositioned(
+            //info icon that triggers animation
             bottom: bottom4,
             right: right4,
             duration: Duration(milliseconds: 1200),
@@ -533,7 +532,6 @@ class _GameMapState extends State<GameMap> {
       ),
       onMapCreated: _onMapCreated,
       myLocationEnabled: true,
-      //mapType: MapType.hybrid,
       compassEnabled: true,
     );
   }

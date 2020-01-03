@@ -1,11 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-//import 'package:flutter/rendering.dart';
+import 'package:shared_preferences/shared_preferences.dart' as prefix0;
+// import 'package:flutter/rendering.dart';
 
 import './pages/home_page.dart';
+import './pages/authentication.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  //debugPaintSizeEnabled = true;
-  //debugPaintBaselinesEnabled = true;
+  // debugPaintSizeEnabled = true;
+  // debugPaintBaselinesEnabled = true;
   //debugPaintPointersEnabled = true;
   runApp(MyApp());
 }
@@ -16,9 +22,34 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Map<String, dynamic> user = {
+    "name": "",
+    "username": "",
+    "token": "",
+    "isAuthenticated": false,
+    "email": "",
+    "password": ""
+  };
+
+  void autoAuthenticate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var _token = prefs.getString("token");
+    if (_token != null) {
+      setState(() {
+        user["isAuthenticated"] = true;
+        user["username"] = prefs.getString("username");
+        user["token"] = prefs.getString("token");
+        user["email"] = prefs.getString("email");
+        user["password"] = prefs.getString("password");
+        user["name"] = prefs.getString("name");
+      });
+    }
+  }
+
 
   @override
   void initState() {
+    autoAuthenticate();
     super.initState();
   }
 
@@ -28,12 +59,12 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       //debugShowMaterialGrid: true,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.red,
-        accentColor: Colors.black
-      ),
+          brightness: Brightness.dark,
+          primaryColor: Colors.red,
+          accentColor: Colors.black),
       routes: {
-        "/": (BuildContext context) => HomePage(),
+        "/": (BuildContext context) =>
+            user["isAuthenticated"] ? HomePage(user) : AuthPage(user),
       },
     );
   }
