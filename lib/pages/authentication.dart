@@ -34,6 +34,8 @@ class _AuthPageState extends State<AuthPage> {
 
   bool _isLoading = false;
 
+  String api_url = "5b1c3c18.ngrok.io";
+
   AuthMode _authmode = AuthMode.login;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -47,13 +49,14 @@ class _AuthPageState extends State<AuthPage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-        Uri.encodeFull("http://8f4420a0.ngrok.io/api/auth/login/"),
+        Uri.encodeFull("http://$api_url/api/auth/login/"),
         headers: {"Content-Type": "application/json"},
         body: json.encode(_loginFormData));
     var data = json.decode(response.body);
+    print(data);
     if (data.length == 1) {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Unable to log in with provided credentials"),
+        content: Text("unable to log in with provided credentials"),
         duration: Duration(seconds: 1),
       ));
       setState(() {
@@ -87,13 +90,13 @@ class _AuthPageState extends State<AuthPage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-        Uri.encodeFull("http://8f4420a0.ngrok.io/api/auth/register/"),
+        Uri.encodeFull("http://$api_url/api/auth/register/"),
         headers: {"Content-Type": "application/json"},
         body: json.encode(_registerFormData));
     var data = json.decode(response.body);
     if (data.length == 1) {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text(data["username"]),
+        content: Text("a user with that username already exists"),
         duration: Duration(seconds: 1),
       ));
       setState(() {
@@ -123,22 +126,28 @@ class _AuthPageState extends State<AuthPage> {
   Widget _usernameTextField() {
     return TextFormField(
       style: TextStyle(
-        color: Colors.black,
+        color: Colors.white.withOpacity(0.7),
       ),
       decoration: InputDecoration(
         suffixIcon: Icon(
           Icons.person,
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.7),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
+        // filled: true,
+        // fillColor: Colors.white.withOpacity(0.7),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
           borderRadius: BorderRadius.circular(10),
         ),
         labelText: "username",
         labelStyle: TextStyle(
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
       ),
       validator: (String value) {
@@ -158,22 +167,28 @@ class _AuthPageState extends State<AuthPage> {
     return TextFormField(
       controller: _passwordTextController,
       style: TextStyle(
-        color: Colors.black,
+        color: Colors.white.withOpacity(0.7),
       ),
       decoration: InputDecoration(
         suffixIcon: Icon(
           Icons.lock,
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.7),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
+        // filled: true,
+        // fillColor: Colors.white.withOpacity(0.7),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
           borderRadius: BorderRadius.circular(10),
         ),
         labelText: "password",
         labelStyle: TextStyle(
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
       ),
       obscureText: true,
@@ -193,22 +208,28 @@ class _AuthPageState extends State<AuthPage> {
   Widget _nameTextField() {
     return TextFormField(
       style: TextStyle(
-        color: Colors.black,
+        color: Colors.white.withOpacity(0.7),
       ),
       decoration: InputDecoration(
         suffixIcon: Icon(
           Icons.person_outline,
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.7),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
+        // filled: true,
+        // fillColor: Colors.white.withOpacity(0.7),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
           borderRadius: BorderRadius.circular(10),
         ),
         labelText: "name",
         labelStyle: TextStyle(
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
       ),
       validator: (String value) {
@@ -225,22 +246,28 @@ class _AuthPageState extends State<AuthPage> {
   Widget _emailTextField() {
     return TextFormField(
       style: TextStyle(
-        color: Colors.black,
+        color: Colors.white.withOpacity(0.7),
       ),
       decoration: InputDecoration(
         suffixIcon: Icon(
           Icons.email,
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.7),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
+        // filled: true,
+        // fillColor: Colors.white.withOpacity(0.7),
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.7), width: 3),
           borderRadius: BorderRadius.circular(10),
         ),
         labelText: "email ID",
         labelStyle: TextStyle(
-          color: Colors.black,
+          color: Colors.white.withOpacity(0.7),
         ),
       ),
       keyboardType: TextInputType.emailAddress,
@@ -296,7 +323,7 @@ class _AuthPageState extends State<AuthPage> {
                     Text(
                       "INTERFICIO",
                       style: TextStyle(
-                          fontSize: 65,
+                          fontSize: 59,
                           color: Color(0xFFC84407),
                           fontWeight: FontWeight.bold),
                     ),
@@ -345,6 +372,10 @@ class _AuthPageState extends State<AuthPage> {
                                   padding: EdgeInsets.only(right: 20),
                                   child: CircularProgressIndicator())
                               : FlatButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  color: Colors.white.withOpacity(0.3),
                                   splashColor: Theme.of(context).accentColor,
                                   child: Text(
                                     '${_authmode == AuthMode.login ? 'LOGIN' : 'REGISTER'}',

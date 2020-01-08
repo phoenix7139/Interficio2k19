@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 GoogleMapController mapController;
 
-String api_url = "8f4420a0.ngrok.io";
+String api_url = "5b1c3c18.ngrok.io";
 
 bool header = false;
 
@@ -43,13 +43,10 @@ class _HomePageState extends State<HomePage> {
     bool perm = await location.hasPermission();
     print(perm);
     LocationData currentLocation = await location.getLocation();
-    print(currentLocation.latitude);
-    print(currentLocation.longitude);
     location.changeSettings(accuracy: LocationAccuracy.HIGH);
     setState(() {
       location.onLocationChanged().listen((LocationData currentLocation) {
         setState(() {
-          print("hello");
           lat = currentLocation.latitude;
           long = currentLocation.longitude;
           accuracy = currentLocation.accuracy;
@@ -64,7 +61,7 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
     http.Response response = await http.get(
-        Uri.encodeFull("http://8f4420a0.ngrok.io/api/getlevel/"),
+        Uri.encodeFull("http://$api_url/api/getlevel/"),
         headers: {"Authorization": "Token ${user["token"]}"});
     levelData = json.decode(response.body);
     setState(() {
@@ -75,7 +72,7 @@ class _HomePageState extends State<HomePage> {
 //this function retrieves the current leaderboard
   Future getScoreboard() async {
     http.Response response = await http.get(
-        Uri.encodeFull("http://8f4420a0.ngrok.io/api/scoreboard/"),
+        Uri.encodeFull("http://$api_url/api/scoreboard/"),
         headers: {"Authorization": "Token ${user["token"]}"});
     leaderboard = json.decode(response.body);
   }
@@ -86,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-      Uri.encodeFull("http://8f4420a0.ngrok.io/api/submit/ans/"),
+      Uri.encodeFull("http://$api_url/api/submit/ans/"),
       headers: {
         "Authorization": "Token ${user["token"]}",
         "Content-Type": "application/json"
@@ -115,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       _isLoading = true;
     });
     http.Response response = await http.post(
-      Uri.encodeFull("http://8f4420a0.ngrok.io/api/submit/location/"),
+      Uri.encodeFull("http://$api_url/api/submit/location/"),
       headers: {
         "Authorization": "Token ${user["token"]}",
         "Content-Type": "application/json"
@@ -201,6 +198,13 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          offset: Offset.zero,
+                          blurRadius: 10,
+                          spreadRadius: 5),
+                    ],
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -244,6 +248,13 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            offset: Offset.zero,
+                            blurRadius: 10,
+                            spreadRadius: 5),
+                      ],
                       color: Colors.grey,
                       borderRadius: BorderRadius.circular(17),
                     ),
@@ -255,8 +266,10 @@ class _HomePageState extends State<HomePage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              levelData["title"] == null
-                                  ? Container()
+                              _isLoading
+                                  ? Container(
+                                      padding: EdgeInsets.only(right: 20),
+                                      child: CircularProgressIndicator())
                                   : Text(
                                       levelData["title"],
                                       style: TextStyle(
@@ -273,41 +286,13 @@ class _HomePageState extends State<HomePage> {
                               levelData["title"] == null
                                   ? Container()
                                   : levelData["map_hint"]
-                                      ? Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.location_on,
-                                              size: 28,
-                                            ),
-                                            SizedBox(
-                                              width: 50.0,
-                                            ),
-                                            Text(
-                                              "location hint",
-                                              style: TextStyle(
-                                                  color: Color(0xFFFFE000)
-                                                      .withOpacity(0.7),
-                                                  fontSize: 21),
-                                            )
-                                          ],
+                                      ? Icon(
+                                          Icons.location_on,
+                                          size: 28,
                                         )
-                                      : Row(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.assistant_photo,
-                                              size: 28,
-                                            ),
-                                            SizedBox(
-                                              width: 50.0,
-                                            ),
-                                            Text(
-                                              "main question",
-                                              style: TextStyle(
-                                                  color: Color(0xFFFFE000)
-                                                      .withOpacity(0.7),
-                                                  fontSize: 21),
-                                            )
-                                          ],
+                                      : Icon(
+                                          Icons.assistant_photo,
+                                          size: 28,
                                         ),
                             ],
                           ),
@@ -319,8 +304,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          levelData["title"] == null
-              ? Container()
+          _isLoading
+              ? Container(
+                  padding: EdgeInsets.only(right: 20),
+                  child: CircularProgressIndicator())
               : AnimatedPositioned(
                   //question along with textfield for answer and submit button
                   top: _isOpen && _isUp
@@ -445,7 +432,7 @@ class _HomePageState extends State<HomePage> {
               child: AnimatedOpacity(
                 duration: Duration(milliseconds: 900),
                 curve: Curves.easeOutQuart,
-                opacity: _isUp ? 0.5 : 0.8,
+                opacity: _isUp ? 0.6 : 0.8,
                 child: GestureDetector(
                   onVerticalDragStart: (context) {
                     setState(() {
@@ -456,6 +443,13 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
                     decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            offset: Offset.zero,
+                            blurRadius: 10,
+                            spreadRadius: 5),
+                      ],
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -502,7 +496,7 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
-                                      "${index}",
+                                      "$index",
                                       style: TextStyle(
                                           fontSize: 23,
                                           fontWeight: FontWeight.bold),
@@ -569,15 +563,6 @@ class _HomePageState extends State<HomePage> {
                 Icons.info,
                 size: 70,
               ),
-            ),
-          ),
-          Positioned(
-            top: 5,
-            left: 5,
-            child: Image.asset(
-              "assets/map.png",
-              width: 100,
-              height: 100,
             ),
           ),
         ],

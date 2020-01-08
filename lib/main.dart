@@ -10,7 +10,7 @@ import './pages/authentication.dart';
 void main() {
   // debugPaintSizeEnabled = true;
   // debugPaintBaselinesEnabled = true;
-  //debugPaintPointersEnabled = true;
+  // debugPaintPointersEnabled = true;
   runApp(MyApp());
 }
 
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
 
   void autoAuthenticate() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.clear();
+    prefs.clear();
     var _token = prefs.getString("token");
     if (_token != null) {
       setState(() {
